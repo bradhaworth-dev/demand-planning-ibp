@@ -30,15 +30,27 @@ def generate_discontinued(base_volume: int, num_weeks: int, std_dev: float, disc
     discontinued_vol[discontinue_week:] = 0
     return discontinued_vol
 
+def generate_npi(base_volume: int, num_weeks: int, std_dev: float, launch_week: int, ramp_weeks: int, **kwargs) -> np.ndarray:
+    """
+    Generates new product introduction with 0 weeks starting then increases over a certain amount of weeks to full base volume.
+    # TODO: Add ramp
+    """
+    npi_volume = (base_volume + (np.random.normal(0, std_dev, size = num_weeks))).round().astype(int)
+    npi_volume[:launch_week] = 0
+    ramp = np.linspace(0,1, num=ramp_weeks)
+    npi_volume[launch_week:launch_week + ramp_weeks] = (npi_volume[launch_week:launch_week + ramp_weeks] * ramp).round().astype(int)
+    return npi_volume
+
 PATTERN_GENERATORS = {
     "steady":       generate_steady,
     "trend":        generate_trend,
     "seasonal":     generate_seasonal,
-    "discontinued": generate_discontinued
+    "discontinued": generate_discontinued,
+    "npi":          generate_npi,
 }
 
 ## Test ##
 if __name__ == "__main__":
-    param = {"base_volume": 500, "num_weeks": 104, "std_dev":5, "trend":-4.0, "amplitude": 150, "discontinue_week": 60}
-    test = PATTERN_GENERATORS["discontinued"](**param)
+    param = {"base_volume": 500, "num_weeks": 104, "std_dev":5, "trend":-4.0, "amplitude": 150, "discontinue_week": 60, "launch_week": 30, "ramp_weeks": 8}
+    test = PATTERN_GENERATORS["npi"](**param)
     print(test)
