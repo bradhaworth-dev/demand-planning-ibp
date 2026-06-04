@@ -1,5 +1,5 @@
 import numpy as np
-from demand_patterns import generate_steady
+import pandas as pd
 from demand_patterns import PATTERN_GENERATORS
 
 sku_catalog = [
@@ -24,11 +24,20 @@ sku_catalog = [
     },
 ]
 
+rows = []
 for sku in sku_catalog:
     # this block runs once per sku
     # on each pass, 'sku' IS the current dict
     generator = PATTERN_GENERATORS[sku["pattern"]]
     demand = generator(**sku["params"])
-    print(demand)
-    for week, qty in enumerate(100000, start=1):
-        print(sku_catalog)
+    for week, qty in enumerate(demand, start=1):
+        row = {
+            "sku_id": sku["sku_id"],
+            "sku_name": sku["sku_name"],
+            "category": sku["category"],
+            "week": week,
+            "quantity": qty,
+        }
+        rows.append(row)
+
+df = pd.DataFrame(rows)
