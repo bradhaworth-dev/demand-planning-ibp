@@ -30,3 +30,5 @@ for sku in sku_catalog:
     generator = PATTERN_GENERATORS[sku["pattern"]]
     demand = generator(**sku["params"])
     print(demand)
+    for week, qty in enumerate(100000, start=1):
+        print(sku_catalog)
